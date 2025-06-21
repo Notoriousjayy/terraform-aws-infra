@@ -1,5 +1,3 @@
-# environments/dev/main.tf
-
 provider "aws" {
   region = var.aws_region
 }
@@ -29,36 +27,18 @@ module "vpc" {
 }
 
 # ────────────────────────────────────────────────────────────
-# DNS Servers: master + two slaves
+# EC2
 # ────────────────────────────────────────────────────────────
-
-# Master
-module "dns_master" {
-  source            = "../../modules/dns-server"
-  role              = "master"
-  zone_name         = var.zone_name
+module "ec2" {
+  source            = "../../modules/ec2"
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   instance_type     = var.instance_type
-  key_name          = aws_key_pair.debian.key_name
+  instance_name     = var.instance_name
+
+  # use the key we just uploaded
+  key_name = aws_key_pair.debian.key_name
+
+  environment       = var.environment
 }
 
-# Slave roles
-locals {
-  dns_slave_roles = ["slave1", "slave2"]
-}
-
-# Slaves (each will pull zones from the master)
-module "dns_slave" {
-  source            = "../../modules/dns-server"
-  for_each          = toset(local.dns_slave_roles)
-
-  role              = "slave"
-  zone_name         = var.zone_name
-  master_ip         = module.dns_master.public_ip
-
-  vpc_id            = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnet_ids
-  instance_type     = var.instance_type
-  key_name          = aws_key_pair.debian.key_name
-}
