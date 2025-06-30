@@ -12,3 +12,8 @@ output "public_dns" {
   description = "Public DNS"
   value       = aws_instance.this.public_dns
 }
+
+output "ssh_sg_id" {
+  description = "Security group ID allowing SSH"
+  value       = aws_security_group.ssh.id
+}
