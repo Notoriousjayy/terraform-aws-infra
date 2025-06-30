@@ -38,3 +38,18 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+# ────────────────────────────────────────────────────────────
+# DNS server settings
+# ────────────────────────────────────────────────────────────
+variable "dns_instance_type" {
+  description = "EC2 instance type for DNS server"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "dns_instance_name" {
+  description = "Name tag for DNS server"
+  type        = string
+  default     = "dev-dns-server"
+}

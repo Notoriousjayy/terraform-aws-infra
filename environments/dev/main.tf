@@ -36,9 +36,20 @@ module "ec2" {
   instance_type     = var.instance_type
   instance_name     = var.instance_name
 
-  # use the key we just uploaded
-  key_name = aws_key_pair.debian.key_name
-
-  environment       = var.environment
+  key_name    = aws_key_pair.debian.key_name
+  environment = var.environment
 }
 
+# ────────────────────────────────────────────────────────────
+# DNS Server
+# ────────────────────────────────────────────────────────────
+module "dns_server" {
+  source               = "../../modules/dns-server"
+  name                 = var.dns_instance_name
+  environment          = var.environment
+  instance_type        = var.dns_instance_type
+  key_name             = aws_key_pair.debian.key_name
+
+  vpc_security_group_ids = [module.ec2.ssh_sg_id]
+  subnet_id              = module.vpc.public_subnet_ids[0]
+}
